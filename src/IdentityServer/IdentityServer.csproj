@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.1" />
     <PackageReference Include="IdentityServer4.AspNetIdentity" Version="3.0.2" />
     <PackageReference Include="IdentityServer4.EntityFramework" Version="3.0.2" />
 
@@ -36,9 +37,5 @@
     <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-    <PackageReference Include="SourceLink.Create.GitHub" Version="2.8.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 </Project>

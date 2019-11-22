@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
-
-using CSharp.OAuth.Server.IdentityManager;
+using IdentityServer.Identity;
+using FluentValidation.AspNetCore;
 using IdentityServer.Data;
 using IdentityServer.Models;
 using IdentityServer4.EntityFramework.DbContexts;
@@ -16,6 +15,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System.Reflection;
+using IdentityServer.Dtos;
+using IdentityServer.Extensions;
 
 namespace IdentityServer
 {
@@ -32,7 +33,8 @@ namespace IdentityServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddFluentValidation(config => config.RegisterValidatorsFromAssembly(typeof(AddIdentityResourceDto).Assembly));
 
             // configures IIS out-of-proc settings (see https://github.com/aspnet/AspNetCore/issues/14882)
             services.Configure<IISOptions>(iis =>
@@ -73,7 +75,6 @@ namespace IdentityServer
                         b.UseSqlServer(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
                 })
-                //.AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>()
                 .AddAspNetIdentity<ApplicationUser>();
 
             if (Environment.IsDevelopment())
@@ -82,6 +83,8 @@ namespace IdentityServer
             }
 
             services.AddAuthentication();
+
+            services.AddServices();
         }
 
         public void Configure(IApplicationBuilder app)

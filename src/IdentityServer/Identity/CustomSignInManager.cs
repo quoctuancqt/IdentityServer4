@@ -1,4 +1,4 @@
-﻿namespace CSharp.OAuth.Server.IdentityManager
+﻿namespace IdentityServer.Identity
 {
     using IdentityServer.Models;
     using Microsoft.AspNetCore.Authentication;
