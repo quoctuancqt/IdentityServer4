@@ -19,7 +19,7 @@ namespace ApiGateway
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(authenticationProviderKey, config =>
                 {
-                    config.Authority = "http://localhost:5000";
+                    config.Authority = "http://192.168.2.122:5000";
                     config.ApiName = "api1";
                     config.SupportedTokens = SupportedTokens.Jwt;
                     config.RequireHttpsMetadata = false;
