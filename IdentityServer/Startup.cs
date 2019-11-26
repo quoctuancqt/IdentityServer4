@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using IdentityServer.Dtos;
 using IdentityServer.Extensions;
+using Microsoft.IdentityModel.Logging;
 
 namespace IdentityServer
 {
@@ -52,6 +53,8 @@ namespace IdentityServer
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
+
+            IdentityModelEventSource.ShowPII = true;
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));

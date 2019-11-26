@@ -37,6 +37,9 @@ namespace ApiGateway
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthorization();
+            app.UseAuthentication();
+
             await app.UseOcelot();
         }
     }
