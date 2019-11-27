@@ -18,6 +18,7 @@ using System.Reflection;
 using IdentityServer.Dtos;
 using IdentityServer.Extensions;
 using Microsoft.IdentityModel.Logging;
+using IdentityServer4.Configuration;
 
 namespace IdentityServer
 {
@@ -71,6 +72,7 @@ namespace IdentityServer
                     options.Events.RaiseInformationEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
+                    options.IssuerUri = Configuration.GetValue<string>("IdentitySettings:IssuerUri");
                 })
                 .AddConfigurationStore(options =>
                 {

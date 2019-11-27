@@ -3,38 +3,30 @@
     {
       "DownstreamPathTemplate": "/api/payment",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7001
-        }
-      ],
+      "ServiceName": "paymentapi",
       "UpstreamPathTemplate": "/payment",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "microservices",
+        "AuthenticationProviderKey": "identityserverapikey",
         "AllowedScopes": []
       }
     },
     {
       "DownstreamPathTemplate": "/api/product",
       "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7002
-        }
-      ],
+      "ServiceName": "productapi",
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "microservices",
+        "AuthenticationProviderKey": "identityserverapikey",
         "AllowedScopes": []
       }
     }
   ],
   "GlobalConfiguration": {
-    "RequestIdKey": "OcRequestId",
-    "AdministrationPath": "/administration"
+    "ServiceDiscoveryProvider": {
+      "Namespace": "default",
+      "Type": "kube"
+    }
   }
 }
