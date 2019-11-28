@@ -31,8 +31,8 @@ namespace ApiGateway
 
             services.AddHealthChecks()
                 .AddCheck("sefl", () => HealthCheckResult.Healthy())
-                .AddUrlGroup(new Uri("http://localhost:7001/hc"), "paymentapi-hc", failureStatus: HealthStatus.Degraded)
-                .AddUrlGroup(new Uri("http://localhost:7002/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
+                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7001/hc"), "paymentapi-hc", failureStatus: HealthStatus.Degraded)
+                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7002/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddIdentityServerAuthentication(authenticationProviderKey, config =>
@@ -44,6 +44,8 @@ namespace ApiGateway
             });
 
             services.AddOcelot(Configuration).AddKubernetes();
+
+            services.AddHealthChecksUI();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,8 +67,16 @@ namespace ApiGateway
                 ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
             });
 
+            app.UseRouting();
+
             app.UseAuthorization();
             app.UseAuthentication();
+
+
+            app.UseEndpoints(config =>
+            {
+                config.MapHealthChecksUI();
+            });
 
             await app.UseOcelot();
         }
