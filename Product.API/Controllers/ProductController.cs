@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace Product.API.Controllers
 {
@@ -28,9 +29,16 @@ namespace Product.API.Controllers
         [HttpGet("bad-request")]
         public IActionResult BadRequestResult()
         {
-            _logger.LogError("Bad request from Product API");
+            try
+            {
+                throw new Exception("Bad request from Product API");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+            }
 
-            return BadRequest("Bad request from Product API");
+            return Ok();
         }
     }
 
