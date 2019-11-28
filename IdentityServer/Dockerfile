@@ -1,13 +1,12 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["IdentityServer.csproj", "IdentityServer/"]
-
+COPY ["IdentityServer/IdentityServer.csproj", "IdentityServer/"]
 RUN dotnet restore "IdentityServer/IdentityServer.csproj"
-COPY . ./IdentityServer/
+COPY . .
 WORKDIR "/src/IdentityServer"
 RUN dotnet build "IdentityServer.csproj" -c Release -o /app/build
 

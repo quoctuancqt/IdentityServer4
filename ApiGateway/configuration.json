@@ -12,11 +12,33 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/api/payment/bad-request",
+      "DownstreamScheme": "http",
+      "ServiceName": "paymentapi",
+      "UpstreamPathTemplate": "/payment/bad-request",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "identityserverapikey",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/product",
       "DownstreamScheme": "http",
       "ServiceName": "productapi",
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "identityserverapikey",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/product/bad-request",
+      "DownstreamScheme": "http",
+      "ServiceName": "productapi",
+      "UpstreamPathTemplate": "/product/bad-request",
+      "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "identityserverapikey",
         "AllowedScopes": []

@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Payment.API.Controllers
 {
@@ -7,6 +8,13 @@ namespace Payment.API.Controllers
     [Route("api/[controller]")]
     public class PaymentController : ControllerBase
     {
+        private readonly ILogger<PaymentController> _logger;
+
+        public PaymentController(ILogger<PaymentController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -20,6 +28,8 @@ namespace Payment.API.Controllers
         [HttpGet("bad-request")]
         public IActionResult BadRequestResult()
         {
+            _logger.LogError("Bad request from Payment API");
+
             return BadRequest("Bad request from Payment API");
         }
     }

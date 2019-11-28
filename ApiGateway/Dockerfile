@@ -1,13 +1,12 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["ApiGateway.csproj", "ApiGateway/"]
-
+COPY ["ApiGateway/ApiGateway.csproj", "ApiGateway/"]
 RUN dotnet restore "ApiGateway/ApiGateway.csproj"
-COPY . ./ApiGateway/
+COPY . .
 WORKDIR "/src/ApiGateway"
 RUN dotnet build "ApiGateway.csproj" -c Release -o /app/build
 

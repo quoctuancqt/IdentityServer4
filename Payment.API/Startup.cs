@@ -1,3 +1,4 @@
+using Core.Extensions;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -15,6 +16,8 @@ namespace Payment.API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            LoggerExtension.ConfigureSeriLog(Configuration);
         }
 
         public IConfiguration Configuration { get; }

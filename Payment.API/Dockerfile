@@ -1,13 +1,13 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS base
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
 WORKDIR /app
 EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["Payment.API.csproj", "Payment.API/"]
-
+COPY ["Payment.API/Payment.API.csproj", "Payment.API/"]
+COPY ["Core/Core.csproj", "Core/"]
 RUN dotnet restore "Payment.API/Payment.API.csproj"
-COPY . ./Payment.API/
+COPY . .
 WORKDIR "/src/Payment.API"
 RUN dotnet build "Payment.API.csproj" -c Release -o /app/build
 
