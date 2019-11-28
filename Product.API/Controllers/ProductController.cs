@@ -16,6 +16,12 @@ namespace Product.API.Controllers
 
             return Ok(productsFaker.Generate(10));
         }
+
+        [HttpGet("bad-request")]
+        public IActionResult BadRequestResult()
+        {
+            return BadRequest("Bad request from Product API");
+        }
     }
 
     public class Product

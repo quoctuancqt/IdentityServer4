@@ -16,6 +16,12 @@ namespace Payment.API.Controllers
 
             return Ok(paymentsFaker.Generate(10));
         }
+
+        [HttpGet("bad-request")]
+        public IActionResult BadRequestResult()
+        {
+            return BadRequest("Bad request from Payment API");
+        }
     }
 
     public class Payment
