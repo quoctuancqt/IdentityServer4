@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0
+ARG BUILD_CONFIGURATION=Debug
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+EXPOSE 80
+
+WORKDIR /src
+COPY ["Core/Core.csproj", "Core/"]
+COPY ["Ordering.API/Ordering.API.csproj", "Ordering.API/"]
+
+RUN dotnet restore "Ordering.API/Ordering.API.csproj"
+COPY . .
+WORKDIR "/src/Ordering.API"
+RUN dotnet build --no-restore "Ordering.API.csproj" -c $BUILD_CONFIGURATION
+
+RUN echo "exec dotnet run --no-build --no-launch-profile -c $BUILD_CONFIGURATION --" > /entrypoint.sh
+
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

@@ -1,35 +1,44 @@
-﻿using Bogus;
-using Core.Exceptions;
+﻿using Core.Api;
 using Microsoft.AspNetCore.Mvc;
+using Product.API.AutoMapper;
+using Product.API.Dtos;
+using Product.API.Repository;
+using System.Threading.Tasks;
 
 namespace Product.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    public class ProductController : BaseApi
     {
+        private readonly IProductRepository _repository;
+
+        public ProductController(IProductRepository repository)
+        {
+            _repository = repository;
+        }
+
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> GetAll()
         {
-            var productsFaker = new Faker<Product>()
-                .RuleFor(x => x.Name, (f, u) => f.Commerce.ProductName())
-                .RuleFor(x => x.Price, (f, u) => decimal.Parse(f.Commerce.Price()));
-
-            return Ok(productsFaker.Generate(10));
+            return Ok(await _repository.FindAllAsync());
         }
 
-        [HttpGet("bad-request")]
-        public IActionResult BadRequestResult()
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
         {
-            throw new BadRequestException("Bad request from Product API");
+            return Ok(await _repository.FindByIdAsync(id));
         }
-    }
 
-    public class Product
-    {
-        public string Name { get; set; }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] AddProductDto product)
+        {
+            var entity = product.ToEntity();
 
-        public decimal Price { get; set; }
+            _repository.Add(entity);
+
+            await _repository.UnitOfWork.SaveChangesAsync();
+
+            return Ok(entity.ToDto());
+        }
     }
 }
