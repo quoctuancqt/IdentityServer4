@@ -1,7 +1,6 @@
 ﻿using Bogus;
+using Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
 
 namespace Product.API.Controllers
 {
@@ -9,12 +8,6 @@ namespace Product.API.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly ILogger<ProductController> _logger;
-
-        public ProductController(ILogger<ProductController> logger)
-        {
-            _logger = logger;
-        }
 
         [HttpGet]
         public IActionResult Get()
@@ -29,16 +22,7 @@ namespace Product.API.Controllers
         [HttpGet("bad-request")]
         public IActionResult BadRequestResult()
         {
-            try
-            {
-                throw new Exception("Bad request from Product API");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-            }
-
-            return Ok();
+            throw new BadRequestException("Bad request from Product API");
         }
     }
 

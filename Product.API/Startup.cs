@@ -40,6 +40,8 @@ namespace Product.API
 
             loggerFactory.AddSerilog();
 
+            app.AddLog(loggerFactory);
+
             app.UseHealthChecks("/hc", new HealthCheckOptions
             {
                 Predicate = _ => true,
