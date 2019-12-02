@@ -31,8 +31,7 @@ namespace ApiGateway
 
             services.AddHealthChecks()
                 .AddCheck("sefl", () => HealthCheckResult.Healthy())
-                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7001/hc"), "paymentapi-hc", failureStatus: HealthStatus.Degraded)
-                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7002/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
+                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7001/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddIdentityServerAuthentication(authenticationProviderKey, config =>

@@ -1,20 +1,6 @@
 {
   "ReRoutes": [
     {
-      "DownstreamPathTemplate": "/api/payment",
-      "DownstreamScheme": "http",
-      "ServiceName": "paymentapi",
-      "UpstreamPathTemplate": "/payment",
-      "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
-      "AddClaimsToRequest": {
-        "UserId": "Claims[sub] > value[0] > |"
-      },
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "identityserverapikey",
-        "AllowedScopes": []
-      }
-    },
-    {
       "DownstreamPathTemplate": "/api/product",
       "DownstreamScheme": "http",
       "ServiceName": "productapi",

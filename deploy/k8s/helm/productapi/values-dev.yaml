@@ -19,7 +19,7 @@ service:
   port: 7001
 
 appSettings:
-  environment: 'Production'
+  environment: 'Development'
 
 probes:
   enabled: false
