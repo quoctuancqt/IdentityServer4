@@ -52,6 +52,8 @@ spec:
                   key: {{ $key }}
             {{- end }}
             {{- end }}
+            - name: "ASPNETCORE_ENVIRONMENT"
+              value: {{ .Values.appSettings.environment }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.imagePullSecrets }}

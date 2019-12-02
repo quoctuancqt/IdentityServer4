@@ -284,3 +284,8 @@ __pycache__/
 /mongodb
 /Blog/wwwroot/ChatImages
 /Blog/Properties/PublishProfiles
+/src/ApiGateway/appsettings.Development.json
+/src/IdentityServer/appsettings.Development.json
+/src/Notify.API/appsettings.Development.json
+/src/Ordering.API/appsettings.Development.json
+/src/Product.API/appsettings.Development.json

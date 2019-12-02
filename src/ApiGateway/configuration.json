@@ -7,7 +7,7 @@
       "UpstreamPathTemplate": "/payment",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
       "AddClaimsToRequest": {
-        "UserId": "Claims[sub] > value > |"
+        "UserId": "Claims[sub] > value[0] > |"
       },
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "identityserverapikey",
@@ -21,7 +21,7 @@
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
       "AddClaimsToRequest": {
-        "UserId": "Claims[sub] > value > |"
+        "UserId": "Claims[sub] > value[0] > |"
       },
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "identityserverapikey",

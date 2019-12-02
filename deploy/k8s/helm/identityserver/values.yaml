@@ -18,6 +18,9 @@ service:
   type: LoadBalancer
   port: 5000
 
+appSettings:
+  environment: 'Production'
+
 probes:
   enabled: false
 
