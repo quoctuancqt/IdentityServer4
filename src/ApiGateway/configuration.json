@@ -6,8 +6,8 @@
       "ServiceName": "productapi",
       "UpstreamPathTemplate": "/product",
       "UpstreamHttpMethod": [ "POST", "PUT", "GET" ],
-      "AddClaimsToRequest": {
-        "UserId": "Claims[sub] > value[0] > |"
+      "AddHeadersToRequest": {
+        "UserId": "Claims[sub] > value > |"
       },
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "identityserverapikey",

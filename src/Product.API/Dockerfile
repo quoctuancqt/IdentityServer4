@@ -17,4 +17,11 @@ RUN dotnet publish "Product.API.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+# Install the dependencies for Visual Studio Remote Debugger
+RUN apt-get update && apt-get install -y --no-install-recommends unzip procps
+
+# Install Visual Studio Remote Debugger
+RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l ~/vsdbg  
+
 ENTRYPOINT ["dotnet", "Product.API.dll"]

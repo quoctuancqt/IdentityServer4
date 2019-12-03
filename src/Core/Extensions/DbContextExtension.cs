@@ -1,9 +1,9 @@
-﻿using Core.ContextFactory;
+﻿using Core.Contants;
+using Core.ContextFactory;
 using Core.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +17,9 @@ namespace Core.Extensions
         {
             services.AddScoped<IContextFactory<TContext>>((serviceProvider) =>
             {
-                var user = serviceProvider.GetService<IHttpContextAccessor>().HttpContext.User;
+                var userId = serviceProvider.GetService<IHttpContextAccessor>().HttpContext.Request.Headers[ClaimsConstant.USER_ID];
 
-                return new ContextFactory<TContext>(ContextFactory<TContext>.GetDbContext(connectionString, user?.Claims?.FirstOrDefault(c => c.Type == "UserId")?.Value));
+                return new ContextFactory<TContext>(ContextFactory<TContext>.GetDbContext(connectionString, userId));
             });
 
             return services;

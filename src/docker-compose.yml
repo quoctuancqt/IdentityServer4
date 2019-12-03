@@ -14,11 +14,11 @@ services:
       dockerfile: IdentityServer/Dockerfile
 
 
-  ordering.api:
-    image: ${DOCKER_REGISTRY-}orderingapi
-    build:
-      context: .
-      dockerfile: Ordering.API/Dockerfile
+ # ordering.api:
+ #   image: ${DOCKER_REGISTRY-}orderingapi
+ #   build:
+ #     context: .
+ #     dockerfile: Ordering.API/Dockerfile
 
 
   product.api:
