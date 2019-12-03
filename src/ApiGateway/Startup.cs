@@ -30,8 +30,8 @@ namespace ApiGateway
             var authenticationProviderKey = "identityserverapikey";
 
             services.AddHealthChecks()
-                .AddCheck("sefl", () => HealthCheckResult.Healthy())
-                .AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7001/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
+                .AddCheck("sefl", () => HealthCheckResult.Healthy());
+                //.AddUrlGroup(new Uri($"{Configuration.GetValue<string>("BaseUrl")}:7001/hc"), "productapi-hc", failureStatus: HealthStatus.Degraded);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddIdentityServerAuthentication(authenticationProviderKey, config =>
@@ -44,7 +44,11 @@ namespace ApiGateway
 
             services.AddOcelot(Configuration).AddKubernetes();
 
-            services.AddHealthChecksUI();
+            services.AddHealthChecksUI(setupSettings: setup =>
+            {
+                setup.AddHealthCheckEndpoint("productapi", $"{Configuration.GetValue<string>("BaseUrl")}:7001/hc");
+                setup.AddHealthCheckEndpoint("self", $"{Configuration.GetValue<string>("BaseUrl")}:7000/hc");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,7 +78,10 @@ namespace ApiGateway
 
             app.UseEndpoints(config =>
             {
-                config.MapHealthChecksUI();
+                config.MapHealthChecksUI(setup =>
+                {
+                    setup.UIPath = "/healthchecks-ui";
+                });
             });
 
             await app.UseOcelot();

@@ -19,10 +19,6 @@ namespace Core.Extensions
             {
                 var user = serviceProvider.GetService<IHttpContextAccessor>().HttpContext.User;
 
-                var logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger("Debug");
-
-                logger.LogDebug($"Claims: {user?.Claims?.Select(x => x.Type).ToArray()}");
-
                 return new ContextFactory<TContext>(ContextFactory<TContext>.GetDbContext(connectionString, user?.Claims?.FirstOrDefault(c => c.Type == "UserId")?.Value));
             });
 
