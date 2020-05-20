@@ -18,7 +18,7 @@ namespace IdentityServer
                 new IdentityResources.Profile(),
                 new IdentityResources.Email(),
                 new IdentityResources.Phone(),
-                new IdentityResources.Address(),
+                new IdentityResources.Address()
             };
 
 
@@ -68,7 +68,49 @@ namespace IdentityServer
                         IdentityServerConstants.StandardScopes.Profile,
                         "api1"
                     }
-                }
+                },
+                new Client
+                    {
+                        ClientId = "product1.mci.com",
+                        ClientName = "Prduct 1 MasterCard",
+                        AllowedGrantTypes = GrantTypes.Hybrid,
+                        RequireConsent = false,
+
+                        RedirectUris = {"http://product1.mci.com:6001/signin-oidc"},
+                        PostLogoutRedirectUris = {"http://product1.mci.com:6001"},
+
+                        ClientSecrets =
+                        {
+                          new Secret("product1".Sha256())
+                        },
+
+                        AllowedScopes = new List<string>
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile
+                        }
+                    },
+                    new Client
+                    {
+                        ClientId = "product1.amex.com",
+                        ClientName = "Prduct 1 Amex",
+                        AllowedGrantTypes = GrantTypes.Hybrid,
+                        RequireConsent = false,
+
+                        RedirectUris = {"http://product1.amex.com:7001/signin-oidc"},
+                        PostLogoutRedirectUris = {"http://product1.amex.com:7001"},
+
+                        ClientSecrets =
+                        {
+                          new Secret("product1".Sha256())
+                        },
+
+                        AllowedScopes = new List<string>
+                        {
+                            IdentityServerConstants.StandardScopes.OpenId,
+                            IdentityServerConstants.StandardScopes.Profile
+                        }
+                    }
             };
     }
 }
