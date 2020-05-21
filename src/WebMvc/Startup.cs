@@ -38,13 +38,15 @@ namespace WebMvc
                     options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
 
-                    options.ClientId = "mvc";
-                    options.ClientSecret = "secret";
+                    options.ClientId = "0b791e06-0d97-4fc4-8682-65e18b5d3a8f";
+                    options.ClientSecret = "2e9c95d0-19e9-4ee6-9c8b-b65824f64179";
                     options.ResponseType = "code";
 
                     options.SaveTokens = true;
 
-                    options.Scope.Add("api1");
+                    options.Scope.Add("openid");
+                    options.Scope.Add("profile");
+                    options.Scope.Add("api_server");
                 });
         }
 

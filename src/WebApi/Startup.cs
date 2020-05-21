@@ -27,7 +27,7 @@ namespace WebApi
                     options.Authority = "http://localhost:5000";
                      options.RequireHttpsMetadata = false;
                     // name of the API resource
-                    options.Audience = "api1";
+                    options.Audience = "api_server";
                  });
         }
 

@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using IdentityServer.Services;
 using IdentityServer.Services.Idsrv4;
 using Microsoft.Extensions.Logging;
+using IdentityServer4.Services;
 
 namespace IdentityServer
 {
@@ -111,6 +112,8 @@ namespace IdentityServer
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
             });
+
+            services.AddTransient<IProfileService, ProfileService>();
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
