@@ -1,12 +1,14 @@
 ﻿using IdentityServer.Dtos;
 using IdentityServer.Dtos.Base;
 using IdentityServer.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace IdentityServer.Apis
 {
+    [Authorize]
     public class ClientsController : ApiBase<ClientsController>
     {
 

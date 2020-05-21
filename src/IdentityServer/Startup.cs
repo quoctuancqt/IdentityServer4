@@ -17,6 +17,14 @@ using System.Linq;
 using System.Reflection;
 using IdentityServer.Dtos;
 using IdentityServer.Extensions;
+using IdentityServer4.AccessTokenValidation;
+using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.HttpOverrides;
+using IdentityServer.Services;
+using IdentityServer.Services.Idsrv4;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityServer
 {
@@ -36,20 +44,6 @@ namespace IdentityServer
             services.AddControllersWithViews()
                 .AddFluentValidation(config => config.RegisterValidatorsFromAssembly(typeof(AddIdentityResourceDto).Assembly));
 
-            // configures IIS out-of-proc settings (see https://github.com/aspnet/AspNetCore/issues/14882)
-            services.Configure<IISOptions>(iis =>
-            {
-                iis.AuthenticationDisplayName = "Windows";
-                iis.AutomaticAuthentication = false;
-            });
-
-            // configures IIS in-proc settings
-            services.Configure<IISServerOptions>(iis =>
-            {
-                iis.AuthenticationDisplayName = "Windows";
-                iis.AutomaticAuthentication = false;
-            });
-
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
@@ -64,27 +58,62 @@ namespace IdentityServer
 
             var builder = services.AddIdentityServer(options =>
                 {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
+                    options.UserInteraction.LoginUrl = "/account/login";
+                    options.UserInteraction.LogoutUrl = "/account/logout";
+                    options.UserInteraction.ConsentUrl = "/consent/index";
+                    options.IssuerUri = Configuration.GetValue<string>("Idsr4:IssuerUri");
+                    options.PublicOrigin = Configuration.GetValue<string>("Idsr4:IssuerUri");
                 })
+                .AddAspNetIdentity<ApplicationUser>()
+                .AddClientStore<ClientService>()
+                .AddRedirectUriValidator<RedirectUriValidator>()
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = b =>
                         b.UseSqlServer(connectionString,
                             sql => sql.MigrationsAssembly(migrationsAssembly));
-                })
-                .AddAspNetIdentity<ApplicationUser>();
+                });
 
             builder.AddDeveloperSigningCredential();
 
-            services.AddAuthentication();
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = Configuration.GetValue<string>("Idsr4:IssuerUri");
+                    options.ApiName = Configuration.GetValue<string>("Idsr4:Scope");
+                    options.RequireHttpsMetadata = false;
+                    options.SupportedTokens = SupportedTokens.Both;
+                });
 
             services.AddServices();
+
+            services.AddSwashbuckle(Configuration, option =>
+            {
+                option.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        Implicit = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("Idsr4:IssuerUri")}/connect/authorize"),
+                            Scopes = new Dictionary<string, string> {
+                                { Configuration.GetValue<string>("Idsr4:Scope"), "Swagger API" }
+                            }
+                        }
+                    }
+                });
+
+                option.OperationFilter<AuthorizeCheckOperationFilter>();
+            });
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             if (Environment.IsDevelopment())
             {
@@ -93,15 +122,30 @@ namespace IdentityServer
                 InitializeDatabase(app);
             }
 
+            app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"), option =>
+            {
+                option.OAuthClientId(Configuration.GetValue<string>("Idsr4:ClientId"));
+                option.OAuthAppName(Configuration.GetValue<string>("Idsr4:Scope"));
+            });
+
+            app.SetPathBaseUrl(Configuration.GetValue<string>("PathBaseUrl"));
+
             app.UseStaticFiles();
 
             app.UseRouting();
-            app.UseAuthorization();
+
             app.UseIdentityServer();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
             });
+
+            app.AddConsoleLifetime<Startup>(loggerFactory);
         }
 
         private void InitializeDatabase(IApplicationBuilder app)
