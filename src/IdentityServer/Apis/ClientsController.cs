@@ -44,5 +44,52 @@ namespace IdentityServer.Apis
 
         #endregion ResourceOwnerPassword
 
+        #region ImplicitAndHybrid
+
+        [HttpPost("")]
+        public async Task<IActionResult> Create([FromBody] AddClientDto dto)
+        {
+            var result = CheckValidation(dto);
+
+            if (!result.IsValid) return BadRequest(result.Errors);
+
+            return Ok(await _clientService.CreateAsync(dto));
+        }
+
+        [HttpPut("{clientId}")]
+        public async Task<IActionResult> Update(string clientId, [FromBody] EditClientDto dto)
+        {
+            var result = CheckValidation(dto);
+
+            if (!result.IsValid) return BadRequest(result.Errors);
+
+            return Ok(await _clientService.UpdateAsync(clientId, dto));
+        }
+
+
+        [HttpDelete("{clientId}")]
+        public async Task<IActionResult> Delete(string clientId)
+        {
+            await _clientService.DeleteAsync(clientId);
+
+            return Success();
+        }
+        #endregion ImplicitAndHybrid
+
+        #region Scopes
+
+        [HttpPost("scope/{value}")]
+        public async Task<IActionResult> AddScope(string value)
+        {
+            await _clientService.CreateApiResourceAsync(new string[] { value });
+
+            return Success();
+        }
+
+        [HttpGet("scopes")]
+        public async Task<IActionResult> GetScopes()
+            => Ok(await _clientService.GetApiResourceAsync());
+
+        #endregion Scopes
     }
 }

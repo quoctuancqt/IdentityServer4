@@ -10,9 +10,17 @@ namespace IdentityServer.Services
     {
         Task CreateIdentityResourceAsync();
 
-        Task CreateApiResourceAsync();
+        Task CreateApiResourceAsync(string[] values);
+
+        Task<string[]> GetApiResourceAsync();
 
         Task CreateResourceOwnerPasswordAsync(AddClientResourceOwnerPasswordDto dto);
+
+        Task<object> CreateAsync(AddClientDto dto);
+
+        Task<object> UpdateAsync(string clientId, EditClientDto dto);
+
+        Task DeleteAsync(string clientId);
 
         Task<PageResultDto<Client>> SearchAsync(QuerySearchDefault @param);
 

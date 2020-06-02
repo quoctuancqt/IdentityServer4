@@ -26,6 +26,7 @@ using IdentityServer.Services;
 using IdentityServer.Services.Idsrv4;
 using Microsoft.Extensions.Logging;
 using IdentityServer4.Services;
+using DistributedCache;
 
 namespace IdentityServer
 {
@@ -68,6 +69,7 @@ namespace IdentityServer
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddClientStore<ClientService>()
                 .AddRedirectUriValidator<RedirectUriValidator>()
+                .AddCustomAuthorizeRequestValidator<CustomAuthorizeRequestValidator>()
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = b =>
@@ -114,6 +116,10 @@ namespace IdentityServer
             });
 
             services.AddTransient<IProfileService, ProfileService>();
+
+            services.Configure<TenantConfig>(Configuration.GetSection("TenantConfig"));
+
+            services.AddSqlServerCache(Configuration);
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
@@ -153,59 +159,87 @@ namespace IdentityServer
 
         private void InitializeDatabase(IApplicationBuilder app)
         {
-            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            using var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+
+            var appContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            appContext.Database.Migrate();
+
+            var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+            context.Database.Migrate();
+
+            var passwordHash = serviceScope.ServiceProvider.GetRequiredService<IPasswordHasher<ApplicationUser>>();
+
+            if (!context.Clients.Any())
             {
-                var appContext = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                appContext.Database.Migrate();
-
-                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
-                context.Database.Migrate();
-
-                var passwordHash = serviceScope.ServiceProvider.GetRequiredService<IPasswordHasher<ApplicationUser>>();
-
-                if (!context.Clients.Any())
+                foreach (var client in Config.Clients)
                 {
-                    foreach (var client in Config.Clients)
-                    {
-                        context.Clients.Add(client.ToEntity());
-                    }
-                    context.SaveChanges();
+                    context.Clients.Add(client.ToEntity());
                 }
+                context.SaveChanges();
+            }
 
-                if (!context.IdentityResources.Any())
+            if (!context.IdentityResources.Any())
+            {
+                foreach (var resource in Config.Ids)
                 {
-                    foreach (var resource in Config.Ids)
-                    {
-                        context.IdentityResources.Add(resource.ToEntity());
-                    }
-                    context.SaveChanges();
+                    context.IdentityResources.Add(resource.ToEntity());
                 }
+                context.SaveChanges();
+            }
 
-                if (!context.ApiResources.Any())
+            if (!context.ApiResources.Any())
+            {
+                foreach (var resource in Config.Apis)
                 {
-                    foreach (var resource in Config.Apis)
-                    {
-                        context.ApiResources.Add(resource.ToEntity());
-                    }
-                    context.SaveChanges();
+                    context.ApiResources.Add(resource.ToEntity());
                 }
+                context.SaveChanges();
+            }
 
-                if (!appContext.Users.Any())
+            if (!appContext.Roles.Any())
+            {
+                var superAdminRole = new IdentityRole
                 {
-                    var user = new ApplicationUser
-                    {
-                        UserName = "admin",
-                        Email = "admin@yopmail.com",
-                        NormalizedUserName = "admin@yopmail.com".ToUpper(),
-                        NormalizedEmail = "admin@yopmail.com".ToUpper()
-                    };
+                    Id = "06717e3f-78aa-42fb-8195-5eac6f170f62",
+                    Name = "SuperAdministrator",
+                    NormalizedName = "SuperAdministrator".ToUpper()
+                };
 
-                    user.PasswordHash = passwordHash.HashPassword(user, "Aa123456");
+                var adminRole = new IdentityRole
+                {
+                    Id = "50c1d91f-ee19-4f20-94fd-aa9b52ce74cc",
+                    Name = "Administrator",
+                    NormalizedName = "Administrator".ToUpper()
+                };
 
-                    appContext.Users.Add(user);
+                var userRole = new IdentityRole
+                {
+                    Id = "d6e5821c-89e6-4fa7-95ba-68d3a0803eb5",
+                    Name = "NormalUser",
+                    NormalizedName = "NormalUser".ToUpper()
+                };
 
-                    appContext.SaveChanges();
-                }
+                appContext.Roles.Add(adminRole);
+                appContext.Roles.Add(userRole);
+                appContext.Roles.Add(superAdminRole);
+                appContext.SaveChanges();
+            }
+
+            if (!appContext.Users.Any())
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = "admin",
+                    Email = "admin@yopmail.com",
+                    NormalizedUserName = "admin@yopmail.com".ToUpper(),
+                    NormalizedEmail = "admin@yopmail.com".ToUpper()
+                };
+
+                user.PasswordHash = passwordHash.HashPassword(user, "Aa123456");
+                appContext.UserRoles.Add(new IdentityUserRole<string> { RoleId = "06717e3f-78aa-42fb-8195-5eac6f170f62", UserId = user.Id });
+                appContext.Users.Add(user);
+
+                appContext.SaveChanges();
             }
         }
     }

@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebMvc", "src\WebMvc\WebMvc.csproj", "{AD19BD71-4AAF-4889-9004-C7FDCF4965E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedCache", "DistributedCache\DistributedCache.csproj", "{1884871C-7006-4B71-890C-AA8D7A5ED17B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{AD19BD71-4AAF-4889-9004-C7FDCF4965E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD19BD71-4AAF-4889-9004-C7FDCF4965E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD19BD71-4AAF-4889-9004-C7FDCF4965E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1884871C-7006-4B71-890C-AA8D7A5ED17B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1884871C-7006-4B71-890C-AA8D7A5ED17B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1884871C-7006-4B71-890C-AA8D7A5ED17B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1884871C-7006-4B71-890C-AA8D7A5ED17B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 		{C7E2580F-F8EF-4260-8A35-4D6489A3BAED} = {E26311BB-42EB-40DA-9C38-F53ED3D7631E}
 		{8928A203-6E9A-4403-A21B-2BD42320B806} = {E26311BB-42EB-40DA-9C38-F53ED3D7631E}
 		{AD19BD71-4AAF-4889-9004-C7FDCF4965E2} = {E26311BB-42EB-40DA-9C38-F53ED3D7631E}
+		{1884871C-7006-4B71-890C-AA8D7A5ED17B} = {E26311BB-42EB-40DA-9C38-F53ED3D7631E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {89646F1C-E281-4168-A03F-35351DF23CFE}
