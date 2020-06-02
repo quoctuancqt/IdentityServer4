@@ -60,11 +60,11 @@ namespace IdentityServer
                     ClientSecrets = { new Secret("2e9c95d0-19e9-4ee6-9c8b-b65824f64179".Sha256()) },
                     RequireConsent = false,
                     RedirectUris = {
-                        "http://localhost:5002/signin-oidc",
+                        "http://localhost:5052/signin-oidc",
                         "http://localhost:5000/swagger/oauth2-redirect.html",
                     },
                     PostLogoutRedirectUris = {
-                        "http://localhost:5002/signout-callback-oidc",
+                        "http://localhost:5052/signout-callback-oidc",
                         "http://localhost:5000/swagger/index.html",
                     },
                     AllowedScopes =
@@ -83,11 +83,11 @@ namespace IdentityServer
                     ClientSecrets = { new Secret("089e122c-6f55-4eaa-a2aa-1b7718a2a8de".Sha256()) },
                     RequireConsent = false,
                      RedirectUris = {
-                        "http://localhost:5003/signin-oidc",
+                        "http://localhost:5053/signin-oidc",
                         "http://localhost:5000/swagger/oauth2-redirect.html",
                     },
                     PostLogoutRedirectUris = {
-                        "http://localhost:5003/signout-callback-oidc",
+                        "http://localhost:5053/signout-callback-oidc",
                         "http://localhost:5000/swagger/index.html",
                     },
                     AllowedScopes =
