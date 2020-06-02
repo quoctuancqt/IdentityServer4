@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Compile Remove="CustomResourceOwnerPasswordValidator.cs" />
+    <Compile Remove="Services\Idsrv4\CustomTokenRequestValidator.cs" />
   </ItemGroup>
 
   <ItemGroup>

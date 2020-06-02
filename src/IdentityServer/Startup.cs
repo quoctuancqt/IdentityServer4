@@ -69,7 +69,6 @@ namespace IdentityServer
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddClientStore<ClientService>()
                 .AddRedirectUriValidator<RedirectUriValidator>()
-                .AddCustomAuthorizeRequestValidator<CustomAuthorizeRequestValidator>()
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = b =>

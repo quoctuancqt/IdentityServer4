@@ -37,15 +37,15 @@ namespace WebMvc.Controllers
         [Authorize]
         public async Task<IActionResult> Protected()
         {
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //var accessToken = await HttpContext.GetTokenAsync("access_token");
 
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            var content = await client.GetStringAsync("http://localhost:5001/WeatherForecast");
+            //var client = new HttpClient();
+            //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            //var content = await client.GetStringAsync("http://localhost:5001/WeatherForecast");
 
-            var data = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(content);
-
-            return View(data);
+            //var data = JsonConvert.DeserializeObject<IEnumerable<WeatherForecast>>(content);
+            await Task.CompletedTask;
+            return View(new List<WeatherForecast>());
         }
 
         public IActionResult Logout()

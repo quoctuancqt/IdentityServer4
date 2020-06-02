@@ -47,7 +47,7 @@ namespace WebMvc
                     options.Scope.Add("openid");
                     options.Scope.Add("profile");
                     options.Scope.Add("api_server");
-                    options.Scope.Add("offline_access");
+                    //options.Scope.Add("offline_access");
                 });
         }
 
