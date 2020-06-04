@@ -15,5 +15,6 @@ namespace IdentityServer.ViewModels
         [Required(ErrorMessage = "The Confirm password field is required")]
         [Compare("Password", ErrorMessage = "The Confirm password and Password do not match")]
         public string ConfirmPassword { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

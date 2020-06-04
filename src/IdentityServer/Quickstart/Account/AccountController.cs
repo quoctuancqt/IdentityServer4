@@ -212,9 +212,9 @@ namespace IdentityServer4.Quickstart.UI
         }
 
         [HttpGet]
-        public IActionResult Register()
+        public IActionResult Register(string returnUrl)
         {
-            return View();
+            return View(new RegisterViewModel { ReturnUrl = returnUrl });
         }
 
         [HttpPost]
@@ -240,12 +240,12 @@ namespace IdentityServer4.Quickstart.UI
                         UserName = model.Email
                     };
 
-                    var result = await _userManager.CreateAsync(user, model.Password);
+                    var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+
+                    var result = await _userManager.CreateAsync(user, model.Password, context.ClientId);
 
                     if (result.Succeeded)
                     {
-                        await _userManager.SendMailActivationAsync(user);
-
                         return RedirectToAction("Success", "Home", new { type = SuccessTypeEnum.SendConfirmEmail });
                     }
                 }

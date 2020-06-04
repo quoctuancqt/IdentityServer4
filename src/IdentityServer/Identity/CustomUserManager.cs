@@ -1,4 +1,5 @@
-﻿using IdentityServer.Models;
+﻿using IdentityServer.Data;
+using IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,7 @@ namespace IdentityServer.Identity
 {
     public class CustomUserManager : UserManager<ApplicationUser>
     {
+        private readonly ApplicationDbContext _dbContext;
         public CustomUserManager(IUserStore<ApplicationUser> store,
             IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<ApplicationUser> passwordHasher,
@@ -20,9 +22,11 @@ namespace IdentityServer.Identity
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
-            ILogger<UserManager<ApplicationUser>> logger)
+            ILogger<UserManager<ApplicationUser>> logger,
+            ApplicationDbContext dbContext)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
+            _dbContext = dbContext;
         }
 
         public async Task<IList<Claim>> GetClaimsAsync(string userId)
@@ -83,6 +87,24 @@ namespace IdentityServer.Identity
             user.LockoutEnabled = false;
 
             return await UpdateAsync(user);
+        }
+
+        public async Task<IdentityResult> CreateAsync(ApplicationUser user, string password, string clientId)
+        {
+            var result = await base.CreateAsync(user, password);
+
+            if (result.Succeeded)
+            {
+                await base.AddToRoleAsync(user, "NormalUser");
+
+                _dbContext.UserClients.Add(new UserClient { ClientId = clientId, UserId = user.Id });
+
+                await _dbContext.SaveChangesAsync();
+
+                await SendMailActivationAsync(user);
+            }
+
+            return result;
         }
     }
 }

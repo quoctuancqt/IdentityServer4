@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = ViewBag.Title;
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="page-header">
+                <h1>Success</h1>
+            </div>
+            <div class="page-consent">
+                <p>
+                    @ViewBag.Content
+                </p>
+                <a href="@Url.Action("Index","Home")" class="btn btn-success">Back to home page</a>
+            </div>
+        </div>
+    </div>
+</div>

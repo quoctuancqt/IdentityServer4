@@ -12,6 +12,7 @@
                 <div class="panel-body">
                     <form asp-route="Register">
                         @Html.AntiForgeryToken()
+                        @Html.HiddenFor(x => x.ReturnUrl)
                         <fieldset>
                             <div class="form-group">
                                 <label asp-for="Email"></label>

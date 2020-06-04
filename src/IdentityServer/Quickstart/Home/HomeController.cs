@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using IdentityServer.Enums;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +61,28 @@ namespace IdentityServer4.Quickstart.UI
             }
 
             return View("Error", vm);
+        }
+
+        [HttpGet]
+        public IActionResult Success(SuccessTypeEnum type)
+        {
+            switch (type)
+            {
+                case SuccessTypeEnum.SendResetPassword:
+                    ViewBag.Title = "Reset password";
+                    ViewBag.Content = "We sent a link to change the password to your mail, please check your mailbox thanks.";
+                    break;
+                case SuccessTypeEnum.SendConfirmEmail:
+                    ViewBag.Title = "Confirm email";
+                    ViewBag.Content = "We sent an activation link account to your mail, please check your mailbox thanks.";
+                    break;
+                case SuccessTypeEnum.ConfirmEmail:
+                    ViewBag.Title = "Confirm email";
+                    ViewBag.Content = "Your account has been activated.";
+                    break;
+            }
+
+            return View();
         }
     }
 }
