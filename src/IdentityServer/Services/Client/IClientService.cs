@@ -1,4 +1,5 @@
-﻿using IdentityServer.Dtos;
+﻿using DistributedCache.Models;
+using IdentityServer.Dtos;
 using IdentityServer.Dtos.Base;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
@@ -29,5 +30,7 @@ namespace IdentityServer.Services
         Task<bool> IsPkceClientAsync(string clientId);
 
         Task<string> GenerateHeaderCredentialAsync(string clientId);
+
+        Task<TenantProfileModel> RefreshCacheByClientIdAsync(string cliengId);
     }
 }

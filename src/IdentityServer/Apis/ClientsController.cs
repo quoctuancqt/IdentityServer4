@@ -28,6 +28,14 @@ namespace IdentityServer.Apis
         public async Task<IActionResult> SearchAsync([FromQuery]QuerySearchDefault @param)
         => Ok(await _clientService.SearchAsync(@param));
 
+        [HttpGet("refresh-cache/{id}")]
+        [AllowAnonymous]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> RefreshCacheByClientId(string id)
+        {
+            return Ok(await _clientService.RefreshCacheByClientIdAsync(id));
+        }
+
         #region ResourceOwnerPassword
 
         [HttpPost("resource-owner-password")]

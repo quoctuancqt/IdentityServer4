@@ -13,11 +13,11 @@ namespace IdentityServer.Dtos
 
         private readonly string _clientId;
 
-        public AddClientDto() 
+        public AddClientDto()
         {
             _secret = Guid.NewGuid().ToString();
 
-            _clientId = Guid.NewGuid().ToString("n");
+            _clientId = Guid.NewGuid().ToString();
         }
 
         public GrantTypeEnum GrantType { get; set; }

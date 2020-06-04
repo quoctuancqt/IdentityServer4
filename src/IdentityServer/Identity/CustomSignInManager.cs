@@ -34,19 +34,22 @@ namespace IdentityServer.Identity
 
         public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
         {
-            var request = Context.Request;
-
-            var returnUrl = request.QueryString.Value;
-
-            var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-
             var user = await UserManager.FindByNameAsync(userName);
 
             if (user == null) return SignInResult.Failed;
 
-            var userClient = await _dbContext.UserClients.FirstOrDefaultAsync(x => x.UserId.Equals(user.Id) && x.ClientId.Equals(context.ClientId));
+            if (!await UserManager.IsInRoleAsync(user, "SuperAdministrator"))
+            {
+                var request = Context.Request;
 
-            if (userClient == null) return SignInResult.Failed;
+                var returnUrl = request.QueryString.Value;
+
+                var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+
+                var userClient = await _dbContext.UserClients.FirstOrDefaultAsync(x => x.UserId.Equals(user.Id) && x.ClientId.Equals(context.ClientId));
+
+                if (userClient == null) return SignInResult.Failed;
+            }
 
             return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }

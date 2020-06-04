@@ -17,6 +17,8 @@ using IdentityServer.Models;
 using Microsoft.AspNetCore.Identity;
 using DistributedCache.Models;
 using DistributedCache;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace IdentityServer.Services
 {
@@ -92,9 +94,23 @@ namespace IdentityServer.Services
 
                 await SetCacheTenantProfileAsync(entity, user);
 
-                //TO DO: Create DB in each microservices
+                using var client = new HttpClient
+                {
+                    BaseAddress = new Uri("http://localhost:5001")
+                };
 
-                transaction.Commit();
+                client.DefaultRequestHeaders.Add("client_id", entity.ClientId);
+
+                var result = await client.PostAsync($"/api/tenant/create/{entity.ClientId}", new StringContent(JsonConvert.SerializeObject(new { }), Encoding.UTF8, "application/json"));
+
+                if (result.IsSuccessStatusCode)
+                {
+                    await transaction.CommitAsync();
+                }
+                else
+                {
+                    await transaction.RollbackAsync();
+                }
             });
 
             return new { entity.ClientId, Secret = entity.Description };
@@ -132,12 +148,23 @@ namespace IdentityServer.Services
 
                 await SetCacheTenantProfileAsync(entity, user);
 
-                //TO DO: Create DB in each microservices
+                using var client = new HttpClient
+                {
+                    BaseAddress = new Uri("http://localhost:5001")
+                };
+
+                var result = await client.PutAsync($"/api/tenant/update/{clientId}", new StringContent(JsonConvert.SerializeObject(new { }), Encoding.UTF8, "application/json"));
+
+                result.EnsureSuccessStatusCode();
 
                 transaction.Commit();
             });
 
-            return new { entity.ClientId, Secret = entity.Description };
+            return new
+            {
+                entity.ClientId,
+                Secret = entity.Description
+            };
         }
 
         public Task CreateIdentityResourceAsync()
@@ -232,6 +259,15 @@ namespace IdentityServer.Services
             return new PageResultDto<Client>(totalRecord,
                 @param.GetTake(),
                 result.Select(x => x.ToModel()));
+        }
+
+        public async Task<TenantProfileModel> RefreshCacheByClientIdAsync(string cliengId)
+        {
+            var entity = await Context.Clients.SingleOrDefaultAsync(x => x.ClientId.Equals(cliengId));
+
+            var user = await _userManager.FindByNameAsync($"{entity.ClientName}@yopmail.com");
+
+            return await SetCacheTenantProfileAsync(entity, user);
         }
 
         private async Task CheckClientNameExistingAsync(string clientName)

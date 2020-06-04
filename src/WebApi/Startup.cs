@@ -1,3 +1,5 @@
+using Core.Extensions;
+using DistributedCache;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,12 +25,16 @@ namespace WebApi
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                  {
-                    // base-address of your identityserver
-                    options.Authority = "http://localhost:5000";
+                     // base-address of your identityserver
+                     options.Authority = "http://localhost:5000";
                      options.RequireHttpsMetadata = false;
-                    // name of the API resource
-                    options.Audience = "api_server";
+                     // name of the API resource
+                     options.Audience = "api_server";
                  });
+
+            services.AddSqlServerCache(Configuration);
+
+            services.AddContext();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
