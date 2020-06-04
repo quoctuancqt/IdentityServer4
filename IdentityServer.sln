@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebMvc", "src\WebMvc\WebMvc.csproj", "{AD19BD71-4AAF-4889-9004-C7FDCF4965E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedCache", "DistributedCache\DistributedCache.csproj", "{1884871C-7006-4B71-890C-AA8D7A5ED17B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DistributedCache", "src\DistributedCache\DistributedCache.csproj", "{1884871C-7006-4B71-890C-AA8D7A5ED17B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -17,6 +17,9 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer.Identity;
+using IdentityServer.ViewModels;
+using IdentityServer.Enums;
 
 namespace IdentityServer4.Quickstart.UI
 {
@@ -24,16 +27,16 @@ namespace IdentityServer4.Quickstart.UI
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly CustomUserManager _userManager;
+        private readonly CustomSignInManager _signInManager;
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IClientStore _clientStore;
         private readonly IAuthenticationSchemeProvider _schemeProvider;
         private readonly IEventService _events;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            CustomUserManager userManager,
+            CustomSignInManager signInManager,
             IIdentityServerInteractionService interaction,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
@@ -139,7 +142,7 @@ namespace IdentityServer4.Quickstart.UI
                     }
                 }
 
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId:context?.ClientId));
+                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials", clientId: context?.ClientId));
                 ModelState.AddModelError(string.Empty, AccountOptions.InvalidCredentialsErrorMessage);
             }
 
@@ -148,7 +151,7 @@ namespace IdentityServer4.Quickstart.UI
             return View(vm);
         }
 
-        
+
         /// <summary>
         /// Show logout page
         /// </summary>
@@ -208,6 +211,132 @@ namespace IdentityServer4.Quickstart.UI
             return View();
         }
 
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user != null)
+                {
+                    ModelState.AddModelError(nameof(RegisterViewModel.Email), "Email is already existing.");
+
+                    return View(model);
+                }
+                else
+                {
+                    user = new ApplicationUser
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Email = model.Email,
+                        UserName = model.Email
+                    };
+
+                    var result = await _userManager.CreateAsync(user, model.Password);
+
+                    if (result.Succeeded)
+                    {
+                        await _userManager.SendMailActivationAsync(user);
+
+                        return RedirectToAction("Success", "Home", new { type = SuccessTypeEnum.SendConfirmEmail });
+                    }
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return RedirectToAction("Error", "Home", new { type = ErrorTypeEnum.ConfirmEmail });
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            return RedirectToAction("Success", "Home", new { type = SuccessTypeEnum.ConfirmEmail });
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string userId, string token)
+        {
+            return View(new ResetPasswordViewModel { UserId = userId, Token = token });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(nameof(ResetPasswordViewModel.Password), "Invalid token.");
+
+                    return View(model);
+                }
+                else
+                {
+                    var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        ModelState.AddModelError(nameof(ResetPasswordViewModel.Password), "Invalid token.");
+
+                        return View(model);
+                    }
+
+                    return RedirectToAction("Login", "Account");
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(nameof(ForgotPasswordViewModel.Email), "Email is not existing.");
+
+                    return View(model);
+                }
+                else
+                {
+                    await _userManager.SendMailForgotPasswordAsync(user);
+
+                    return RedirectToAction("Success", "Home", new { type = SuccessTypeEnum.SendResetPassword });
+                }
+            }
+
+            return View(model);
+        }
 
         /*****************************************/
         /* helper APIs for the AccountController */

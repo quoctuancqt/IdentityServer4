@@ -49,6 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DistributedCache\DistributedCache.csproj" />
+    <ProjectReference Include="..\..\src\DistributedCache\DistributedCache.csproj" />
   </ItemGroup>
 </Project>

@@ -1,32 +1,52 @@
-﻿namespace IdentityServer.Identity
-{
-    using IdentityServer.Models;
-    using Microsoft.AspNetCore.Authentication;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
-    using System;
-    using System.Threading.Tasks;
+﻿using IdentityServer.Data;
+using IdentityServer.Models;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.Threading.Tasks;
 
+namespace IdentityServer.Identity
+{
     public class CustomSignInManager : SignInManager<ApplicationUser>
     {
+        private readonly IIdentityServerInteractionService _interaction;
+        private readonly ApplicationDbContext _dbContext;
+
         public CustomSignInManager(CustomUserManager userManager,
             IHttpContextAccessor contextAccessor,
             IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory,
             IOptions<IdentityOptions> optionsAccessor,
             ILogger<SignInManager<ApplicationUser>> logger,
             IAuthenticationSchemeProvider schemes,
-            IUserConfirmation<ApplicationUser> confirmation)
+            IUserConfirmation<ApplicationUser> confirmation,
+            IIdentityServerInteractionService interaction,
+            ApplicationDbContext dbContext)
             : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
+            _interaction = interaction;
+            _dbContext = dbContext;
         }
 
         public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
         {
+            var request = Context.Request;
+
+            var returnUrl = request.QueryString.Value;
+
+            var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
+
             var user = await UserManager.FindByNameAsync(userName);
 
             if (user == null) return SignInResult.Failed;
+
+            var userClient = await _dbContext.UserClients.FirstOrDefaultAsync(x => x.UserId.Equals(user.Id) && x.ClientId.Equals(context.ClientId));
+
+            if (userClient == null) return SignInResult.Failed;
 
             return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
         }
