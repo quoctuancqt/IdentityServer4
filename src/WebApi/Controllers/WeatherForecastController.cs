@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -35,6 +37,14 @@ namespace WebApi.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("user-profile")]
+        public IActionResult GetProfile()
+        {
+            var user = HttpContext.User;
+
+            return Ok(new { UserId = user.FindFirst(ClaimTypes.NameIdentifier).Value, Username = user.FindFirst(ClaimTypes.Email), ClientId = user.FindFirst("client_id") });
         }
     }
 }

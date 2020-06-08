@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace IdentityServer.Identity
 {
@@ -42,7 +43,15 @@ namespace IdentityServer.Identity
             {
                 var request = Context.Request;
 
-                var returnUrl = request.QueryString.Value;
+                var absoluteUri = string.Concat(
+                        request.Scheme,
+                        "://",
+                        request.Host.ToUriComponent(),
+                        request.PathBase.ToUriComponent(),
+                        request.Path.ToUriComponent(),
+                        request.QueryString.ToUriComponent());
+
+                var returnUrl = HttpUtility.UrlDecode(absoluteUri).Split("?ReturnUrl=")[1];
 
                 var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
 

@@ -51,7 +51,7 @@ namespace IdentityServer.Dtos
             {
                 ClientId = _clientId,
                 ClientName = ClientName,
-                AllowedGrantTypes = GrantType == GrantTypeEnum.Implicit ? GrantTypes.Implicit : GrantTypes.Code,
+                AllowedGrantTypes = GrantType == GrantTypeEnum.Implicit ? GrantTypes.Implicit : GrantTypes.CodeAndClientCredentials,
                 ClientSecrets =
                 {
                     new Secret(_secret.Sha256())
@@ -64,7 +64,8 @@ namespace IdentityServer.Dtos
                 AllowOfflineAccess = AllowOfflineAccess,
                 AccessTokenLifetime = AccessTokenLifetime,
                 AbsoluteRefreshTokenLifetime = AbsoluteRefreshTokenLifetime,
-                Description = _secret
+                Description = _secret,
+                AlwaysIncludeUserClaimsInIdToken = true
             };
         }
     }

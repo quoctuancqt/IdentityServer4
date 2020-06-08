@@ -21,16 +21,7 @@ namespace Infrastructure
 
                 var user = context.User;
 
-                var clientId = string.Empty;
-
-                if (user == null)
-                {
-                    clientId = context.Request.Headers["client_id"].ToString();
-                }
-                else
-                {
-                    clientId = user.FindFirst("client_id").Value;
-                }
+                var clientId = user?.FindFirst("client_id")?.Value;
 
                 if (string.IsNullOrEmpty(clientId))
                     throw new ForbiddenException("Invalid client.");

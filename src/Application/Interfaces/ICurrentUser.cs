@@ -7,5 +7,7 @@
         string DisplayName { get; }
 
         string Email { get; }
+
+        string ClientId { get; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using FluentValidation;
+using System.Collections.Generic;
 
 namespace IdentityServer.Dtos
 {
@@ -10,4 +11,6 @@ namespace IdentityServer.Dtos
 
         public ICollection<string> AllowedScopes { get; set; }
     }
+
+    public class EditClientDtoValidator : AbstractValidator<EditClientDto> { }
 }
