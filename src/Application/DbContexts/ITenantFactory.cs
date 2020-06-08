@@ -1,8 +1,9 @@
-﻿using DistributedCache.Models;
+﻿using Application.Interfaces;
+using DistributedCache.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace Application.ContextFactory
+namespace Application.DbContexts
 {
     public interface ITenantFactory
     {
@@ -12,6 +13,6 @@ namespace Application.ContextFactory
 
         Task UpdateAsync(string tenantId);
 
-        T GetTenantContext<T>(string id) where T : DbContext;
+        T GetTenantContext<T>(string id, ICurrentUser currentUser) where T : DbContext;
     }
 }

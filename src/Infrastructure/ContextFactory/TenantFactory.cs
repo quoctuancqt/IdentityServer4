@@ -8,6 +8,10 @@ using DistributedCache;
 using DistributedCache.Models;
 using Application.Exceptions;
 using Infrastructure;
+using Common.Helpers;
+using Application.DbContexts;
+using Application.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace Application.ContextFactory
 {
@@ -19,12 +23,16 @@ namespace Application.ContextFactory
 
         private readonly IConfiguration _configuration;
 
+        private readonly ICurrentUser _currentUser;
+
         public TenantFactory(IDistributedCacheService distributedCache,
-            IConfiguration configuration)
+            IConfiguration configuration, ICurrentUser currentUser)
         {
             _distributedCache = distributedCache;
 
             _configuration = configuration;
+
+            _currentUser = currentUser;
 
             dbContextOptionsBuilders = new ConcurrentDictionary<string, DbContextOptionsBuilder<DbContext>>();
         }
@@ -49,11 +57,11 @@ namespace Application.ContextFactory
 
         }
 
-        public T GetTenantContext<T>(string id) where T : DbContext
+        public T GetTenantContext<T>(string id, ICurrentUser currentUser) where T : DbContext
         {
             if (!dbContextOptionsBuilders.TryGetValue(id, out DbContextOptionsBuilder<DbContext> options))
             {
-                var tenant = GetTenantByTenantIdAsync(id).GetAwaiter().GetResult();
+                var tenant = AsyncHelper.RunSync(() => GetTenantByTenantIdAsync(id));
 
                 if (tenant == null) throw new BadRequestException($"Not found tenantId {id}");
 
@@ -64,13 +72,13 @@ namespace Application.ContextFactory
                 dbContextOptionsBuilders.TryAdd(id, options);
             }
 
-            return (T)Activator.CreateInstance(typeof(T), options.Options);
+            return (T)Activator.CreateInstance(typeof(T), options.Options, currentUser);
 
         }
 
         public async Task CreateAsync(string tenantId)
         {
-            using var context = GetTenantContext<ApplicationContext>(tenantId);
+            using var context = GetTenantContext<ApplicationContext>(tenantId, _currentUser);
 
             await context.Database.MigrateAsync();
         }

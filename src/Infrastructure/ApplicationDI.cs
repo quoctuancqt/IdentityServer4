@@ -1,12 +1,13 @@
 ﻿using Application.ContextFactory;
+using Application.DbContexts;
 using Application.Exceptions;
-using Infrastructure;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Core.Extensions
+namespace Infrastructure
 {
-    public static class DbContextExtension
+    public static class ApplicationDI
     {
         public static IServiceCollection AddContext(this IServiceCollection services)
         {
@@ -36,7 +37,9 @@ namespace Core.Extensions
 
                 var tenantFactory = serviceProvider.GetService<ITenantFactory>();
 
-                return tenantFactory.GetTenantContext<ApplicationContext>(clientId);
+                var currentUser = serviceProvider.GetService<ICurrentUser>();
+
+                return tenantFactory.GetTenantContext<ApplicationContext>(clientId, currentUser);
             });
 
             return services;

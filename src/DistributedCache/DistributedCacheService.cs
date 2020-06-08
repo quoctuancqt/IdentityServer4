@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace DistributedCache
 {
-    public class DistributedCacheService: IDistributedCacheService
+    public class DistributedCacheService : IDistributedCacheService
     {
         private readonly IDistributedCache _cache;
 
@@ -44,7 +44,9 @@ namespace DistributedCache
 
         public async Task RemoveAsync(string key, CancellationToken token = default)
         {
-            await _cache.RemoveAsync(key, token);
+            var cache = await _cache.GetAsync(key);
+
+            if (cache != null) await _cache.RemoveAsync(key, token);
         }
 
         public void Set<T>(string key, T value, DistributedCacheEntryOptions options = null)

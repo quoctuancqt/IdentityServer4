@@ -1,4 +1,4 @@
-﻿using Application.ContextFactory;
+﻿using Application.DbContexts;
 using DistributedCache.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;

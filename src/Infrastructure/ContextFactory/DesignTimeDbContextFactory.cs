@@ -1,11 +1,10 @@
-﻿using Infrastructure;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
 
-namespace Application.ContextFactory
+namespace Infrastructure.ContextFactory
 {
     public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationContext>
     {
@@ -13,6 +12,7 @@ namespace Application.ContextFactory
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", optional: true, reloadOnChange: true)
                 .Build();
 
@@ -22,7 +22,7 @@ namespace Application.ContextFactory
 
             builder.UseSqlServer(connectionString);
 
-            return new ApplicationContext(builder.Options);
+            return new ApplicationContext(builder.Options, null);
         }
     }
 }
