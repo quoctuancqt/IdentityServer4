@@ -119,6 +119,8 @@ namespace IdentityServer
             services.Configure<TenantConfig>(Configuration.GetSection("TenantConfig"));
 
             services.AddSqlServerCache(Configuration);
+
+            services.AddCors();
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
@@ -129,6 +131,14 @@ namespace IdentityServer
                 app.UseDatabaseErrorPage();
                 InitializeDatabase(app);
             }
+
+            app.UseCors(policy =>
+            {
+                policy.WithOrigins("localhost");
+                policy.AllowAnyMethod();
+                policy.AllowAnyHeader();
+                policy.AllowCredentials();
+            });
 
             app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"), option =>
             {
