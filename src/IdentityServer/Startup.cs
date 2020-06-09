@@ -132,9 +132,11 @@ namespace IdentityServer
                 InitializeDatabase(app);
             }
 
+            var origins = Configuration.GetValue<string>("Cors").Split(";").ToArray();
+
             app.UseCors(policy =>
             {
-                policy.WithOrigins("localhost");
+                policy.WithOrigins(origins);
                 policy.AllowAnyMethod();
                 policy.AllowAnyHeader();
                 policy.AllowCredentials();

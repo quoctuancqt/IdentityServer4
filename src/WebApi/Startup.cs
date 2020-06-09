@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -30,16 +29,24 @@ namespace WebApi
         {
             services.AddControllers();
 
-            services.AddAuthentication("Bearer")
-                .AddJwtBearer("Bearer", options =>
-                 {
-                     // base-address of your identityserver
-                     options.Authority = "http://localhost:5000";
-                     options.RequireHttpsMetadata = false;
-                     // name of the API resource
-                     options.Audience = "api_server";
-                 });
+            //services.AddAuthentication("Bearer")
+            //    .AddJwtBearer("Bearer", options =>
+            //     {
+            //         // base-address of your identityserver
+            //         options.Authority = Configuration.GetValue<string>("Idsr4:IssuerUri");
+            //         options.RequireHttpsMetadata = false;
+            //         // name of the API resource
+            //         options.Audience = "api_server";
+            //     });
 
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = Configuration.GetValue<string>("Idsr4:IssuerUri");
+                    options.ApiName = Configuration.GetValue<string>("Idsr4:Scope");
+                    options.RequireHttpsMetadata = false;
+                    options.SupportedTokens = SupportedTokens.Both;
+                });
 
             services.AddSqlServerCache(Configuration);
 
@@ -50,31 +57,25 @@ namespace WebApi
 
             services.AddSwashbuckle(Configuration, option =>
             {
-                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                option.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
                 {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "JWT Authorization header using the Bearer scheme."
-                });
+                    Type = SecuritySchemeType.OAuth2,
 
-                option.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                    Flows = new OpenApiOAuthFlows
                     {
-                          new OpenApiSecurityScheme
+                        AuthorizationCode = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("Idsr4:IssuerUri")}/connect/authorize"),
+                            TokenUrl = new Uri($"{Configuration.GetValue<string>("Idsr4:IssuerUri")}/connect/token"),
+                            Scopes = new Dictionary<string, string>
                             {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = "Bearer"
-                                }
+                                { Configuration.GetValue<string>("Idsr4:Scope") , "API Server" }
                             },
-                            new string[] {}
-
+                        }
                     }
                 });
+
+                option.OperationFilter<AuthorizeCheckOperationFilter>();
             });
         }
 
@@ -88,7 +89,10 @@ namespace WebApi
 
             app.UseStaticFiles();
 
-            app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"));
+            app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"), options =>
+            {
+                options.OAuthUsePkce();
+            });
 
             app.UseRouting();
 

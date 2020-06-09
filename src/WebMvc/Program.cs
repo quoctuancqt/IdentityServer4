@@ -20,7 +20,6 @@ namespace WebMvc
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseUrls("http://demo1.local");
                     webBuilder.UseStartup<Startup>();
                 });
     }

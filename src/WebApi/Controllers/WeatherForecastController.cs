@@ -44,7 +44,7 @@ namespace WebApi.Controllers
         {
             var user = HttpContext.User;
 
-            return Ok(new { UserId = user.FindFirst(ClaimTypes.NameIdentifier).Value, Username = user.FindFirst(ClaimTypes.Email).Value, ClientId = user.FindFirst("client_id").Value });
+            return Ok(new { UserId = user.FindFirst("sub").Value, Username = user.FindFirst("name").Value, ClientId = user.FindFirst("client_id").Value });
         }
     }
 }

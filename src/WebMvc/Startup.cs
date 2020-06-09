@@ -35,11 +35,11 @@ namespace WebMvc
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = "http://localhost:5000";
+                    options.Authority = Configuration.GetValue<string>("Idsr4:IssuerUri");
                     options.RequireHttpsMetadata = false;
 
-                    options.ClientId = "ed5d49ee-30bf-4df5-b528-4e6ecc0de23f";
-                    options.ClientSecret = "8abc8220-8b8e-4ea9-8881-eeec1ff5f6c1";
+                    options.ClientId = Configuration.GetValue<string>("TenantConfig:ClientId");
+                    options.ClientSecret = Configuration.GetValue<string>("TenantConfig:ClientSecret");
                     options.ResponseType = "code";
 
                     options.SaveTokens = true;
