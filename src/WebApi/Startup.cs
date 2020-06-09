@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Common.Extensions;
 using DistributedCache;
+using IdentityServer4.AccessTokenValidation;
 using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
@@ -38,6 +40,7 @@ namespace WebApi
                      options.Audience = "api_server";
                  });
 
+
             services.AddSqlServerCache(Configuration);
 
             services.AddContext();
@@ -47,47 +50,30 @@ namespace WebApi
 
             services.AddSwashbuckle(Configuration, option =>
             {
-                //option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                //{
-                //    Name = "Authorization",
-                //    Type = SecuritySchemeType.ApiKey,
-                //    Scheme = "Bearer",
-                //    BearerFormat = "JWT",
-                //    In = ParameterLocation.Header,
-                //    Description = "JWT Authorization header using the Bearer scheme."
-                //});
-
-                //option.AddSecurityRequirement(new OpenApiSecurityRequirement
-                //{
-                //    {
-                //          new OpenApiSecurityScheme
-                //            {
-                //                Reference = new OpenApiReference
-                //                {
-                //                    Type = ReferenceType.SecurityScheme,
-                //                    Id = "Bearer"
-                //                }
-                //            },
-                //            new string[] {}
-
-                //    }
-                //});
-                option.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Type = SecuritySchemeType.OAuth2,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
 
-                    Flows = new OpenApiOAuthFlows
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
                     {
-                        AuthorizationCode = new OpenApiOAuthFlow
-                        {
-                            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("Idsr4:IssuerUri")}/connect/authorize"),
-                            TokenUrl = new Uri($"{Configuration.GetValue<string>("Idsr4:IssuerUri")}/connect/token"),
-                            Scopes = new Dictionary<string, string> {
-                                { Configuration.GetValue<string>("Idsr4:Scope"), "Swagger API" }
-                            }
-                        }
-                    },
-                    Description = "API Server"
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+
+                    }
                 });
             });
         }
@@ -100,11 +86,9 @@ namespace WebApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"), options=> {
-                options.OAuthClientId("");
-                options.OAuthClientSecret("");
-                options.OAuthScopeSeparator(" ");
-            });
+            app.UseStaticFiles();
+
+            app.UseSwashbuckle(Configuration.GetValue<string>("PathBaseUrl"));
 
             app.UseRouting();
 

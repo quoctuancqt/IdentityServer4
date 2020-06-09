@@ -30,6 +30,8 @@ namespace IdentityServer.Dtos
 
         public bool RequireConsent => false;
 
+        public bool RequirePkce => false;
+
         public ICollection<string> RedirectUris { get; set; }
 
         public ICollection<string> PostLogoutRedirectUris { get; set; }
@@ -51,12 +53,12 @@ namespace IdentityServer.Dtos
             {
                 ClientId = _clientId,
                 ClientName = ClientName,
-                AllowedGrantTypes = GrantType == GrantTypeEnum.Implicit ? GrantTypes.Implicit : GrantTypes.CodeAndClientCredentials,
+                AllowedGrantTypes = GetClientGrantTypes(GrantType),
                 ClientSecrets =
                 {
                     new Secret(_secret.Sha256())
                 },
-                AllowAccessTokensViaBrowser = GrantType == GrantTypeEnum.Implicit,
+                AllowAccessTokensViaBrowser = IsAllowAccessTokensViaBrowser(GrantType),
                 RequireConsent = RequireConsent,
                 RedirectUris = RedirectUris,
                 PostLogoutRedirectUris = PostLogoutRedirectUris,
@@ -65,7 +67,31 @@ namespace IdentityServer.Dtos
                 AccessTokenLifetime = AccessTokenLifetime,
                 AbsoluteRefreshTokenLifetime = AbsoluteRefreshTokenLifetime,
                 Description = _secret,
-                AlwaysIncludeUserClaimsInIdToken = true
+                AlwaysIncludeUserClaimsInIdToken = true,
+                RequirePkce = RequirePkce,
+            };
+        }
+
+        private ICollection<string> GetClientGrantTypes(GrantTypeEnum grantTypeEnum)
+        {
+            return (grantTypeEnum) switch
+            {
+                GrantTypeEnum.Implicit => GrantTypes.Implicit,
+                GrantTypeEnum.Code => GrantTypes.Code,
+                GrantTypeEnum.Hybrid => GrantTypes.Hybrid,
+                GrantTypeEnum.CodeAndClientCredentials => GrantTypes.CodeAndClientCredentials,
+                _ => throw new ArgumentException("Grant type not support")
+            };
+        }
+
+        private bool IsAllowAccessTokensViaBrowser(GrantTypeEnum grantTypeEnum)
+        {
+            return (grantTypeEnum) switch
+            {
+                GrantTypeEnum.Implicit => true,
+                GrantTypeEnum.Hybrid => true,
+                GrantTypeEnum.CodeAndClientCredentials => true,
+                _ => false
             };
         }
     }

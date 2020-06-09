@@ -3,6 +3,8 @@
     public enum GrantTypeEnum
     {
         Implicit,
-        Code
+        Code,
+        Hybrid,
+        CodeAndClientCredentials
     }
 }
